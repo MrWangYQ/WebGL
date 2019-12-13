@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>3 day</title>
+  <script src="../js/three.min.js"></script>
+  <style>
+    #canvas-box {
+      width: 100%;
+      height: 600px;
+      border: 1px solid #cccccc;
+    }
+  </style>
+</head>
+<body onload="init()">
+  <div id="canvas-box" class="canvas-box"></div>
+
+
+  <script>
+    let scene;
+    let width;
+    let height;
+    let camera;
+    let geometry;
+    let material;
+    let light;
+    let mesh;
+    let cube;
+    let renderer;
+
+    
+    // 渲染器
+    function initRenderer() {
+      width = document.getElementById('canvas-box').clientWidth;
+      height = document.getElementById('canvas-box').clientHeight;
+
+      renderer = new THREE.WebGLRenderer();
+      renderer.setSize(width, height);    // 场景大小
+      renderer.setClearColor(0xeeeeee, 1.0);                      //  预设背景颜色
+      renderer.shadowMap.enable = true;                           //  阴影效果
+
+      document.getElementById('canvas-box').appendChild(renderer.domElement);
+    }
+
+    //  场景
+    function initScene() {
+      scene = new THREE.Scene();
+    }
+
+    // 相机
+    function initCamera() {
+      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+
+      camera.position.set(10, 10, 10);         // 相机位置
+      camera.lookAt(scene.position);           // 相机焦点
+    }
+
+    // 高亮
+    function initLight() {
+      light = new THREE.PointLight(0xffffff);
+      light.position.set(10, 10, -10);
+      scene.add(light);
+    }
+    
+    // 物体
+    function initGeometry() {
+      geometry = new THREE.BoxGeometry(1,1,1);       // 几何体
+
+      material = new THREE.MeshPhongMaterial({ color: 0x0000FF });    // 材质
+
+      cube = new THREE.Mesh(geometry, material);          // 建立网格物件
+      cube.position.set(0, 0, 0);
+      // scene.add(cube);
+    }
+
+    // 动画
+    function animate() {
+      cube.position.x += 0.01;
+      cube.position.y += 0.01;
+
+      requestAnimationFrame(animate);
+      renderer.render(scene, camera);
+    }
+
+    // 初始化
+    function init() {
+      initScene();
+      initAxes();
+      initCamera();
+      initRenderer();
+      initLight();
+      
+      // 正方体
+      initGeometry();
+
+      // 苦力怕
+      initPlaneGeometry();
+      createCreeper();
+      
+      
+
+      animate();
+    }
+
+
+
+
+
+    //苦力怕
+
+    class Creeper {
+      constructor() {
+        // 设置 头、身体、脚（几何体） 的大小
+        const headGeo = new THREE.BoxGeometry(4, 4, 4);
+        const bodyGeo = new THREE.BoxGeometry(4, 8, 2);
+        const footGeo = new THREE.BoxGeometry(2, 2, 2);
+
+        // 设置几何体的颜色
+        const creeperMat = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+
+        // 头
+        this.head = new THREE.Mesh(headGeo, creeperMat);
+        this.head.position.set(0, 6, 0);
+
+        // 身体
+        this.body = new THREE.Mesh(bodyGeo, creeperMat);
+        this.body.position.set(0, 0, 0);
+
+        // 脚
+        this.foot1 = new THREE.Mesh(footGeo, creeperMat);
+        this.foot1.position.set(-1, -5, 2);
+        
+        this.foot2 = this.foot1.clone();          // 复制 第一支脚的  mesh
+        this.foot2.position.set(-1, -5, -2);
+
+        this.foot3 = this.foot1.clone();
+        this.foot3.position.set(1, -5, 2);
+
+        this.foot4 = this.foot1.clone();
+        this.foot4.position.set(1, -5, -2);
+
+        // 将四只脚组合为一个 group
+        this.feet = new THREE.Group();
+        this.feet.add(this.foot1);
+        this.feet.add(this.foot2);
+        this.feet.add(this.foot3);
+        this.feet.add(this.foot4);
+
+        // 将头、身体、脚 组合为 一个 group
+        this.creeper = new THREE.Group();
+        this.creeper.add(this.head);
+        this.creeper.add(this.body);
+        this.creeper.add(this.feet);
+      }
+    }
+
+    // 生成 苦力怕 加到 场景中
+    function createCreeper() {
+      const createObj = new Creeper();
+      scene.add(createObj.creeper);
+    }
+
+    // 创建 简单的地板
+
+    function initPlaneGeometry () {
+      const PlaneGeometry = new THREE.PlaneGeometry(60, 60);
+      const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+      
+      let plane = new THREE.Mesh(PlaneGeometry, planeMaterial);
+      plane.rotation.x = -0.5 * Math.PI;
+      plane.position.set(0, -7, 0);
+      scene.add(plane);
+    }
+
+    // 坐标轴
+    function initAxes() {
+      let axes = new THREE.AxesHelper(20);     // 参数为坐标轴长度
+      scene.add(axes);
+    }
+  </script>
+</body>
+</html>

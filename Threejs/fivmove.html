@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="./js/three.min.js"></script>
+  <script src="./js/stats.js"></script>
+  <style>
+    #canvas-frame {
+      width: 100%;
+      height: 600px;
+      background: #eeeeee;
+      border: 1px solid #cccccc;
+    }
+  </style>
+</head>
+<body onload="init()">
+  <div id="canvas-frame"></div>
+
+  <script>
+    let renderer;
+    let stats;
+    let width;
+    let height;
+    let mesh;
+
+    function initContainer() {
+      let canvasframe = document.getElementById("canvas-frame");
+      width = canvasframe.clientWidth;
+      height = canvasframe.clientHeight;
+      
+      renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(width, height);
+      
+      document.getElementById("canvas-frame").appendChild(renderer.domElement);
+
+      renderer.setClearColor(0xFFFFFF, 1.0);
+
+      // 游戏循环和性能测试
+      stats = new Stats();
+      stats.domElement.style.position = 'absolute';
+      stats.domElement.style.left = '0';
+      stats.domElement.style.top = '0';
+
+      canvasframe.appendChild(stats.domElement);
+    }
+
+
+    let camera;
+    function initCamera() {
+      camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
+      camera.position.x = 0;
+      camera.position.y = 0;
+      camera.position.z = 600;
+      camera.up.x = 0;
+      camera.up.y = 1;
+      camera.up.z = 0;
+      camera.lookAt({
+        x: 0,
+        y: 0,
+        z: 0,
+      })
+    }
+
+    let scene;
+    function initScene() {
+      scene = new THREE.Scene();
+    }
+
+    let light;
+    function initLight() {
+      light = new THREE.AmbientLight(0xFFFFFF);
+      light.position.set(100, 100, 200);
+      scene.add(light);
+      light = new THREE.PointLight(0x00FF00);
+      light.position.set(0, 0, 300);
+      scene.add(light);
+    }
+
+    let cube;
+
+    function initObject() {
+      let geometry = new THREE.CylinderGeometry( 15, 15, 15 );
+      let material = new THREE.MeshLambertMaterial( { color: 0xFF0000 } );
+      mesh = new THREE.Mesh( geometry, material );
+
+      mesh.position = new THREE.Vector3(0, 0, 0);
+      scene.add(mesh);
+    }
+
+    function init () {
+      initContainer();
+      initCamera();
+      initScene();
+      initLight();
+      initObject();
+
+      animate();
+    }
+    
+    function animate() {
+      requestAnimationFrame(animate);
+      // camera.position.x -= 1;
+      // camera.position.y -= 1;
+
+      mesh.position.x -= 0.01;
+      // mesh.rotation.x += 0.01;
+      // mesh.rotation.y += 0.01;
+      // mesh.rotation.z += 0.01;
+
+      renderer.render(scene, camera);
+
+      // 游戏循环和性能测试
+      stats.update();
+    }
+
+  </script>
+</body>
+</html>

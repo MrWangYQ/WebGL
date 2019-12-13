@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <script src="./js/d3.min.js"></script>
+</head>
+
+<body>
+
+
+  <script>
+    var w = 1000;
+    var h = 300;
+    padding = 10
+    var dataset = [{ key: 0, value: 5 },		//dataset is now an array of objects.
+    { key: 1, value: 10 },		//Each object has a 'key' and a 'value'.
+    { key: 2, value: 13 },
+    { key: 3, value: 19 },
+    { key: 4, value: 21 },
+    { key: 5, value: 25 },
+    { key: 6, value: 22 },
+    { key: 7, value: 18 },
+    { key: 8, value: 15 },
+    { key: 9, value: 13 },
+    { key: 10, value: 11 },
+    { key: 11, value: 12 },
+    { key: 12, value: 15 },
+    { key: 13, value: 20 },
+    { key: 14, value: 18 },
+    { key: 15, value: 17 },
+    { key: 16, value: 16 },
+    { key: 17, value: 18 },
+    { key: 18, value: 23 },
+    { key: 19, value: 25 }];
+    var key = function (d) { return d.key }
+    //定义比例尺
+    var xScale = d3.scaleOrdinal().domain(d3.range(dataset.length))
+      .range([0, w], 0.05)
+    var yScale = d3.scaleLinear().domain([0, d3.max(dataset, function (d) { return d.value })])
+      .range([0, h])
+
+    //生成svg
+    var svg = d3.select('body').append('svg').attr('width', w).attr('height', h)
+    //生成柱形图并绑定数据
+    svg.selectAll('rect').data(dataset, key).enter().append('rect')
+      .attr('x', function (d, i) { return xScale.domain()[i] * (w / dataset.length) })
+      .attr('y', function (d) { return h - yScale(d.value) })
+      .attr('width', w / dataset.length - 2)
+      .attr('height', function (d) { return yScale(d.value) })
+      .attr('fill', '#81D4FA').on('mouseover', function () { return d3.select(this).attr('fill', '#FF9100') })
+      .on('mouseout', function (d) { return d3.select(this).transition().duration(1000).attr('fill', '#81D4FA') })
+    //生成标签
+    svg.selectAll('text').data(dataset, key).enter().append('text').text(function (d) { return d.value })
+      .attr('x', function (d, i) { return xScale.domain()[i] * (w / dataset.length) + (w / dataset.length) / 2 })
+      .attr('y', function (d) { return h - yScale(d.value) + 20 })
+      .attr('font-size', '10px')
+      .attr('font-family', 'san-serif')
+      .attr('fill', 'white')
+
+  </script>
+</body>
+
+</html>
